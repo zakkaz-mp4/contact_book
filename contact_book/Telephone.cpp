@@ -34,6 +34,7 @@ void Telephone::handle_menu_selection() {
 		add_contact();
 		break;
 	case 3:
+		delete_contact();
 		break;
 	case 4:
 		turn_off();
@@ -54,7 +55,7 @@ void Telephone::show_contacts_list() {
 		size_t index = 0;
 		for (Contact &contact : contacts) {
 			index++;
-			std::cout << index << ") Name: " << contact.get_name() << " - " << "Number: " << contact.get_number_phone() << std::endl;
+			std::cout << index << ") Name: " << contact.get_name() << " - " << "Number: " << contact.get_number_phone() << " - " << "Address: " << contact.get_address() << std::endl;
 		}
 	}
 	
@@ -75,11 +76,6 @@ bool Telephone::check_valid_number(std::string number) {
 
 	const size_t min_digits{ 9 };
 
-	if (number.size() < min_digits) {
-		std::cout << "Min digits: " << min_digits << std::endl;
-		return false;
-	}
-	
 	for (char digit : number) {
 		if (!std::isdigit(digit)) {
 			std::cout << "You entered wrong values" << std::endl;
@@ -87,6 +83,11 @@ bool Telephone::check_valid_number(std::string number) {
 		}
 	}
 
+	if (number.size() < min_digits) {
+		std::cout << "Min digits: " << min_digits << std::endl;
+		return false;
+	}
+	
 	return true;
 }
 
@@ -115,6 +116,30 @@ void Telephone::add_contact() {
 	Contact new_contact{ name, number, address};
 	contacts.push_back(new_contact);
 	std::cout << "Wow! You entered a new contact to the list!" << std::endl;
+}
+
+void Telephone::delete_contact() {
+	std::string name_to_delete{};
+	show_contacts_list();
+
+	if (contacts.size() > 0) {
+		std::cout << "Enter the number of the name of the account you want to delete: ";
+		std::getline(std::cin >> std::ws, name_to_delete);
+
+		if (!contact_exists(name_to_delete)) {
+			std::cout << "\"" << name_to_delete << "\" doesn't exists in contacts list.\nDelete aborted." << std::endl;
+			return;
+		}
+
+		size_t i = 0;
+
+		for (auto& contact : contacts) {
+			if (contact.get_name() == name_to_delete) break;
+			i++;
+		}
+
+		contacts.erase(contacts.begin() + i);
+	}
 }
 
 bool Telephone::get_turned_on() {
